@@ -1,0 +1,61 @@
+# =========================
+# IDE & Editors
+# =========================
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# =========================
+# Docker
+# =========================
+.dockerenv
+.dockerignore
+
+# =========================
+# Backend (Spring Boot)
+# =========================
+/backend/target/
+/backend/.mvn/
+/backend/mvnw
+/backend/mvnw.cmd
+/backend/.gradle/
+/backend/build/
+
+# =========================
+# Frontend (React)
+# =========================
+/frontend/node_modules/
+/frontend/build/
+/frontend/.env.local
+/frontend/.env.development.local
+/frontend/.env.test.local
+/frontend/.env.production.local
+/frontend/.next/
+/frontend/out/
+
+# =========================
+# Data & Uploads (НЕ КОММИТИТЬ!)
+# =========================
+/data/uploads/
+/data/regions/*.shp
+/data/regions/*.shx
+/data/regions/*.dbf
+/data/regions/*.prj
+/data/regions/*.cpg
+/data/regions/*.qpj
+
+# =========================
+# Logs & Temp Files
+# =========================
+logs/
+*.log
+*.tmp
+
+# =========================
+# OS & Misc
+# =========================
+*.bak
+*.orig
