@@ -12,6 +12,24 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./data/init-scripts:/docker-entrypoint-initdb.d
+      - ./data/sample-data:/sample-data
+
+  # Сервис для загрузки тестовых данных после инициализации
+  data-loader:
+    image: postgis/postgis:15-3.3
+    depends_on:
+      - postgres
+    volumes:
+      - ./data/sample-data:/sample-data
+    command: >
+      bash -c "
+        until pg_isready -h postgres -p 5432; do sleep 2; done;
+        echo 'Loading sample data...';
+        psql -h postgres -U postgres -d drone_analytics -f /sample-data/test_flights.sql;
+        echo 'Sample data loaded successfully';
+      "
+    environment:
+      PGPASSWORD: password123
 
 volumes:
   postgres_data:
