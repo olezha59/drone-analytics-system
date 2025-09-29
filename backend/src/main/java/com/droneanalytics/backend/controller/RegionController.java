@@ -33,7 +33,7 @@ public class RegionController {
             
             for (RussianRegion region : regions) {
                 Map<String, Object> regionData = new HashMap<>();
-                regionData.put("id", region.getId());
+                regionData.put("id", region.getGid());
                 regionData.put("name", region.getName());
                 regionData.put("regionType", region.getRegionType());
                 regionData.put("isoCode", region.getIsoCode());
@@ -66,7 +66,7 @@ public class RegionController {
         
         for (String[] data : demoData) {
             Map<String, Object> region = new HashMap<>();
-            region.put("id", Long.parseLong(data[0]));
+            region.put("gid", Long.parseLong(data[0]));
             region.put("name", data[1]);
             region.put("regionType", data[2]);
             region.put("isoCode", data[3]);

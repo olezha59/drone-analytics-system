@@ -8,8 +8,8 @@ import org.locationtech.jts.geom.Geometry;  // 👈 ИМПОРТ ДЛЯ ГЕОМ
 public class RussianRegion {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "gid")
+    private Long gid;
     
     @Column(name = "name_1")
     private String name;
@@ -27,7 +27,8 @@ public class RussianRegion {
     // Конструкторы
     public RussianRegion() {}
     
-    public RussianRegion(String name, String regionType, String isoCode, Geometry geom) {
+    public RussianRegion(Long gid, String name, String regionType, String isoCode, Geometry geom) {
+        this.gid = gid;
         this.name = name;
         this.regionType = regionType;
         this.isoCode = isoCode;
@@ -35,8 +36,8 @@ public class RussianRegion {
     }
     
     // Геттеры и сеттеры
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getGid() { return gid; }
+    public void setId(Long gid) { this.gid = gid; }
     
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -54,7 +55,7 @@ public class RussianRegion {
     @Override
     public String toString() {
         return "RussianRegion{" +
-                "id=" + id +
+                "gid=" + gid +
                 ", name='" + name + '\'' +
                 ", regionType='" + regionType + '\'' +
                 ", isoCode='" + isoCode + '\'' +

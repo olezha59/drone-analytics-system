@@ -1,7 +1,9 @@
 package com.droneanalytics.backend.controller;
 
+import com.droneanalytics.backend.dto.FlightWithRegionDto;
 import com.droneanalytics.backend.entity.FlightRecord;
 import com.droneanalytics.backend.service.FlightService;
+import com.droneanalytics.backend.service.RegionMappingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/flights")
@@ -23,63 +26,104 @@ public class FlightController {
     @Autowired
     private FlightService flightService;
     
+    @Autowired 
+    private RegionMappingService regionMappingService;
+    
     /**
      * 📌 GET /api/flights
-     * Получить все полеты с пагинацией
+     * Получить все полеты с пагинацией (С ID региона)
      */
     @GetMapping
-    public ResponseEntity<Page<FlightRecord>> getAllFlights(
+    public ResponseEntity<Page<FlightWithRegionDto>> getAllFlights(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         
         Pageable pageable = PageRequest.of(page, size);
         Page<FlightRecord> flights = flightService.getAllFlights(pageable);
-        return ResponseEntity.ok(flights);
+        
+        // ⚠️ КОНВЕРТИРУЕМ В DTO С ID РЕГИОНА!
+        Page<FlightWithRegionDto> flightDtos = flights.map(flight -> 
+            new FlightWithRegionDto(flight, regionMappingService)
+        );
+        
+        return ResponseEntity.ok(flightDtos);
     }
     
     /**
      * 📌 GET /api/flights/{id}
-     * Получить полет по ID
+     * Получить полет по ID (С ID региона)
      */
     @GetMapping("/{id}")
-    public ResponseEntity<FlightRecord> getFlightById(@PathVariable UUID id) {
+    public ResponseEntity<FlightWithRegionDto> getFlightById(@PathVariable UUID id) {
         Optional<FlightRecord> flight = flightService.getFlightById(id);
-        return flight.map(ResponseEntity::ok)
+        return flight.map(f -> ResponseEntity.ok(new FlightWithRegionDto(f, regionMappingService)))
                     .orElse(ResponseEntity.notFound().build());
     }
     
     /**
      * 📌 GET /api/flights/search?operator=Аэроскан&dateFrom=2024-01-01
-     * Поиск полетов по критериям
+     * Поиск полетов по критериям (С ID региона)
      */
     @GetMapping("/search")
-    public ResponseEntity<List<FlightRecord>> searchFlights(
+    public ResponseEntity<List<FlightWithRegionDto>> searchFlights(
             @RequestParam(required = false) String operator,
             @RequestParam(required = false) String region,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {
         
         List<FlightRecord> flights = flightService.searchFlights(operator, region, dateFrom, dateTo);
-        return ResponseEntity.ok(flights);
+        
+        // ⚠️ КОНВЕРТИРУЕМ В DTO С ID РЕГИОНА!
+        List<FlightWithRegionDto> flightDtos = flights.stream()
+            .map(flight -> new FlightWithRegionDto(flight, regionMappingService))
+            .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(flightDtos);
     }
     
     /**
      * 📌 GET /api/flights/operator/{operatorName}
-     * Получить все полеты оператора
+     * Получить все полеты оператора (С ID региона)
      */
     @GetMapping("/operator/{operatorName}")
-    public ResponseEntity<List<FlightRecord>> getFlightsByOperator(@PathVariable String operatorName) {
+    public ResponseEntity<List<FlightWithRegionDto>> getFlightsByOperator(@PathVariable String operatorName) {
         List<FlightRecord> flights = flightService.getFlightsByOperator(operatorName);
-        return ResponseEntity.ok(flights);
+        
+        // ⚠️ КОНВЕРТИРУЕМ В DTO С ID РЕГИОНА!
+        List<FlightWithRegionDto> flightDtos = flights.stream()
+            .map(flight -> new FlightWithRegionDto(flight, regionMappingService))
+            .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(flightDtos);
     }
     
     /**
      * 📌 GET /api/flights/region/{regionName}
-     * Получить все полеты в регионе
+     * Получить все полеты в регионе (С ID региона)
      */
     @GetMapping("/region/{regionName}")
-    public ResponseEntity<List<FlightRecord>> getFlightsByRegion(@PathVariable String regionName) {
+    public ResponseEntity<List<FlightWithRegionDto>> getFlightsByRegion(@PathVariable String regionName) {
         List<FlightRecord> flights = flightService.getFlightsByRegion(regionName);
+        
+        // ⚠️ КОНВЕРТИРУЕМ В DTO С ID РЕГИОНА!
+        List<FlightWithRegionDto> flightDtos = flights.stream()
+            .map(flight -> new FlightWithRegionDto(flight, regionMappingService))
+            .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(flightDtos);
+    }
+    
+    /**
+     * 📌 GET /api/flights/legacy
+     * Старая версия без ID региона (для обратной совместимости)
+     */
+    @GetMapping("/legacy")
+    public ResponseEntity<Page<FlightRecord>> getAllFlightsLegacy(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        
+        Pageable pageable = PageRequest.of(page, size);
+        Page<FlightRecord> flights = flightService.getAllFlights(pageable);
         return ResponseEntity.ok(flights);
     }
 }

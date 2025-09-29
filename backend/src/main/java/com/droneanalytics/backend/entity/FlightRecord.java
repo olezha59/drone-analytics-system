@@ -92,6 +92,19 @@ public class FlightRecord {
     
     public String getRegionTakeoff() { return regionTakeoff; }
     public void setRegionTakeoff(String regionTakeoff) { this.regionTakeoff = regionTakeoff; }
+
+    @Transient
+    public Double[] getTakeoffCoordsArray() {
+        if (takeoffCoords != null) {
+            // Point хранит координаты как (x, y) где x - долгота, y - широта
+            return new Double[]{
+                takeoffCoords.getX(), // долгота
+                takeoffCoords.getY()  // широта
+            };
+        }
+        return null;
+}
+
     
     @Override
     public String toString() {
