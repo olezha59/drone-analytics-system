@@ -20,6 +20,15 @@ public class FlightService {
     private FlightRecordRepository flightRecordRepository;
 
     /**
+     * 📌 Получить полеты по center_code
+     */
+    public List<FlightRecord> getFlightsByCenterCode(String centerCode) {
+        return flightRecordRepository.findByCenterCode(centerCode);
+    }
+
+
+
+    /**
      * 📌 Получить все полеты с пагинацией
      */
     public Page<FlightRecord> getAllFlights(Pageable pageable) {

@@ -1,0 +1,91 @@
+/* Основные стили */
+.app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 16px 0;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1890ff;
+}
+
+/* Карта */
+.russia-map-container {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.map-legend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: white;
+  padding: 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.legend-color {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  border-radius: 2px;
+}
+
+.legend-color.high { background: #ff4d4f; }
+.legend-color.medium { background: #faad14; }
+.legend-color.low { background: #52c41a; }
+
+/* Статистика */
+.dashboard {
+  padding: 24px;
+}
+
+.metric-card {
+  text-align: center;
+  padding: 16px;
+}
+
+.metric-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.metric-label {
+  color: #666;
+  margin-top: 8px;
+}
+
+.rank-badge {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: #1890ff;
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 12px;
+  }
+  
+  .russia-map-container {
+    height: 400px;
+  }
+}

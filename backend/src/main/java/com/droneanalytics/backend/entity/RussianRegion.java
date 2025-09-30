@@ -3,6 +3,8 @@ package com.droneanalytics.backend.entity;
 import jakarta.persistence.*;
 import org.locationtech.jts.geom.Geometry;  // 👈 ИМПОРТ ДЛЯ ГЕОМЕТРИИ
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "russian_regions")
 public class RussianRegion {
@@ -21,6 +23,7 @@ public class RussianRegion {
     private String isoCode;
     
     // ⚠️ ИСПРАВЛЕННО: Используем Geometry вместо byte[]
+    @JsonIgnore
     @Column(name = "geom", columnDefinition = "geometry(Geometry,4326)")
     private Geometry geom;  // 👈 ТЕПЕРЬ Geometry, а не byte[]
     

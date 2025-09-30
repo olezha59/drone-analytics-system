@@ -29,11 +29,11 @@ class FlightDataParser:
         try:
             with self.db_engine.connect() as conn:
                 # Удаляем старую таблицу если есть
-                conn.execute(text("DROP TABLE IF EXISTS parsed_flight_data CASCADE"))
+                conn.execute(text("DROP TABLE IF EXISTS flight_records CASCADE"))
                 
                 # Создаем таблицу с правильной структурой
                 conn.execute(text("""
-                    CREATE TABLE parsed_flight_data (
+                    CREATE TABLE flight_records (
                         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                         center_code VARCHAR(500) NOT NULL,
                         flight_date DATE,
@@ -63,12 +63,12 @@ class FlightDataParser:
                 
                 # Создаем индексы как в старой таблице
                 conn.execute(text("""
-                    CREATE INDEX idx_parsed_center ON parsed_flight_data (center_code);
-                    CREATE INDEX idx_parsed_date ON parsed_flight_data (flight_date);
-                    CREATE INDEX idx_parsed_number ON parsed_flight_data (flight_number);
-                    CREATE INDEX idx_parsed_operator ON parsed_flight_data (operator_name);
-                    CREATE INDEX idx_parsed_type ON parsed_flight_data (aircraft_type);
-                    CREATE INDEX idx_parsed_region_takeoff ON parsed_flight_data (region_takeoff);
+                    CREATE INDEX idx_parsed_center ON flight_records (center_code);
+                    CREATE INDEX idx_parsed_date ON flight_records (flight_date);
+                    CREATE INDEX idx_parsed_number ON flight_records (flight_number);
+                    CREATE INDEX idx_parsed_operator ON flight_records (operator_name);
+                    CREATE INDEX idx_parsed_type ON flight_records (aircraft_type);
+                    CREATE INDEX idx_parsed_region_takeoff ON flight_records (region_takeoff);
                 """))
                 
                 conn.commit()
@@ -410,7 +410,7 @@ class FlightDataParser:
                     raw_arr_json = json.dumps(flight.get('raw_arr_data', {}), ensure_ascii=False)
                 
                     conn.execute(text("""
-                        INSERT INTO parsed_flight_data (
+                        INSERT INTO flight_records (
                             center_code, flight_date, takeoff_time, landing_time,
                             takeoff_coords, landing_coords, takeoff_coords_text, landing_coords_text,
                             region_takeoff, region_landing, flight_number, aircraft_type,
@@ -452,7 +452,7 @@ class FlightDataParser:
         
             # Проверяем что данные действительно сохранились
             with self.db_engine.connect() as conn:
-                count = conn.execute(text("SELECT COUNT(*) FROM parsed_flight_data")).scalar()
+                count = conn.execute(text("SELECT COUNT(*) FROM flight_records")).scalar()
                 logger.info(f"✅ Проверка БД: в таблице {count} записей")
             
         except Exception as e:
@@ -485,7 +485,7 @@ def main():
         parser.parse_excel_file(EXCEL_FILE)
         
         print("🎉 Парсинг завершен!")
-        print("📊 Проверь данные командой: psql -h localhost -U postgres drone_analytics -c \"SELECT * FROM parsed_flight_data LIMIT 3;\"")
+        print("📊 Проверь данные командой: psql -h localhost -U postgres drone_analytics -c \"SELECT * FROM flight_records LIMIT 3;\"")
         
     except Exception as e:
         logger.error(f"❌ Критическая ошибка: {e}")

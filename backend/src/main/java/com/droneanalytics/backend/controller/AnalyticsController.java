@@ -7,9 +7,18 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 
 @RestController
 @RequestMapping("/api/analytics")
@@ -119,6 +128,25 @@ public class AnalyticsController {
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+    @GetMapping("/regions-geojson")
+    public ResponseEntity<String> getRegionsGeoJSON() {
+        try {
+            Resource resource = new ClassPathResource("geo/regions.geojson");
+            if (!resource.exists()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("GeoJSON file not found");
+            }
+            
+            String geoJson = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+            return ResponseEntity.ok()
+                .header("Content-Type", "application/json")
+                .body(geoJson);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error reading GeoJSON file: " + e.getMessage());
         }
     }
 }

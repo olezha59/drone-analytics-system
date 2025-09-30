@@ -3,7 +3,9 @@ package com.droneanalytics.backend.service;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.PostConstruct;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class RegionMappingService {
@@ -24,6 +26,9 @@ public class RegionMappingService {
         centerCodeToRegionIdMap.put("Иркутский", 18L);          // Irkutsk
         centerCodeToRegionIdMap.put("Хабаровский", 28L);        // Khabarovsk
         centerCodeToRegionIdMap.put("Владивостокский", 56L);    // Primor'ye
+        centerCodeToRegionIdMap.put("Магаданский", 40L);    // Magadan
+        centerCodeToRegionIdMap.put("Тюменский", 73L);    // Tyumen'
+        
         
         // Дополнительные регионы если нужны
         centerCodeToRegionIdMap.put("Архангельский", 4L);       // Arkhangel'sk
@@ -42,5 +47,15 @@ public class RegionMappingService {
     
     public Long getRegionIdByCenterCode(String centerCode) {
         return centerCodeToRegionIdMap.get(centerCode);
+    }
+    
+    /**
+     * 📌 Найти все center_code для региона по ID
+     */
+    public List<String> getCenterCodesByRegionId(Long regionId) {
+        return centerCodeToRegionIdMap.entrySet().stream()
+            .filter(entry -> regionId.equals(entry.getValue()))
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
     }
 }
