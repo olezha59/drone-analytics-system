@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.locationtech.jts.geom.Point;  // 👈 ИМПОРТ ДЛЯ ГЕОДАННЫХ
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -34,6 +35,12 @@ public class FlightRecord {
     
     @Column(name = "takeoff_coords_text")
     private String takeoffCoordsText;
+
+    @Column(name = "takeoff_time")
+    private LocalDateTime takeoffTime;
+
+    @Column(name = "landing_time") 
+    private LocalDateTime landingTime;
     
     // ⚠️ ИСПРАВЛЕННО: Используем Point вместо String
     @JsonIgnore
@@ -92,6 +99,12 @@ public class FlightRecord {
     
     public String getRegionTakeoff() { return regionTakeoff; }
     public void setRegionTakeoff(String regionTakeoff) { this.regionTakeoff = regionTakeoff; }
+
+    public LocalDateTime getTakeoffTime() { return takeoffTime; }
+    public void setTakeoffTime(LocalDateTime takeoffTime) { this.takeoffTime = takeoffTime; }
+
+    public LocalDateTime getLandingTime() { return landingTime; }
+    public void setLandingTime(LocalDateTime landingTime) { this.landingTime = landingTime; }
 
     @Transient
     public Double[] getTakeoffCoordsArray() {
