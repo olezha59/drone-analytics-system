@@ -1,0 +1,136 @@
+// frontend/src/components/Map/RegionSidePanel.tsx
+import React from 'react';
+import { IRegionStats } from '../../types/region';
+import './RegionSidePanel.css';
+
+interface RegionItem {
+  id: number;
+  name: string;
+  totalFlights: number;
+  normalizedValue: number;
+  color: string;
+}
+
+interface RegionSidePanelProps {
+  regions: RegionItem[];
+  selectedRegionId: number | null;
+  onRegionSelect: (regionId: number) => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+  regionStats: IRegionStats | null;
+}
+
+const RegionSidePanel: React.FC<RegionSidePanelProps> = ({
+  regions,
+  selectedRegionId,
+  onRegionSelect,
+  isCollapsed,
+  onToggleCollapse,
+  regionStats
+}) => {
+  // Сортируем регионы по количеству полетов (по убыванию)
+  const sortedRegions = [...regions].sort((a, b) => b.totalFlights - a.totalFlights);
+
+  const getPopularDrone = (stats: IRegionStats): string => {
+    if (!stats.flightsByAircraftType) return 'N/A';
+    const types = Object.entries(stats.flightsByAircraftType);
+    if (types.length === 0) return 'N/A';
+    return types.sort(([,a], [,b]) => b - a)[0][0];
+  };
+
+  if (isCollapsed) {
+    return (
+      <div className="region-panel collapsed">
+        <button 
+          className="toggle-btn"
+          onClick={onToggleCollapse}
+          title="Развернуть панель регионов"
+        >
+          ▶
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="region-panel">
+      <div className="panel-header">
+        <h3>Регионы РФ</h3>
+        <button 
+          className="toggle-btn"
+          onClick={onToggleCollapse}
+          title="Свернуть панель"
+        >
+          ◀
+        </button>
+      </div>
+
+      <div className="panel-content">
+        {/* Детальная статистика выбранного региона */}
+        {selectedRegionId && regionStats && (
+          <div className="region-details">
+            <h4>Детальная статистика</h4>
+            <div className="stats-grid">
+              <div className="stat-card">
+                <div className="stat-value">{regionStats.totalFlights?.toLocaleString() || 0}</div>
+                <div className="stat-label">Всего полетов</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{regionStats.uniqueOperators || 0}</div>
+                <div className="stat-label">Операторов</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{Math.round(regionStats.averageFlightDuration || 0)}</div>
+                <div className="stat-label">Ср. длительность (мин)</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{getPopularDrone(regionStats)}</div>
+                <div className="stat-label">Популярный дрон</div>
+              </div>
+            </div>
+
+            {/* Дополнительная информация */}
+            {regionStats.centerCodes && (
+              <div className="additional-info">
+                <div className="info-item">
+                  <span className="info-label">Центры:</span>
+                  <span className="info-value">{regionStats.centerCodes.join(', ')}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Список регионов */}
+        <div className="regions-list">
+          <div className="list-header">
+            <span>Регион</span>
+            <span>Полетов</span>
+          </div>
+          <div className="regions-scrollable">
+            {sortedRegions.map(region => (
+              <div
+                key={region.id}
+                className={`region-item ${selectedRegionId === region.id ? 'selected' : ''}`}
+                onClick={() => onRegionSelect(region.id)}
+              >
+                <div className="region-info">
+                  <div 
+                    className="region-color"
+                    style={{ backgroundColor: region.color }}
+                  />
+                  <span className="region-name">{region.name}</span>
+                </div>
+                <div className="region-flights">
+                  {region.totalFlights.toLocaleString()}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default RegionSidePanel;

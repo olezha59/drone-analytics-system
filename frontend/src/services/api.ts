@@ -1,8 +1,8 @@
-// ~/drone-analytics-system/frontend/src/services/api.ts
 import axios from 'axios';
-import type { RegionsGeoJSON, RegionStats } from '../types/region';
+import type { IRegionsGeoJSON, IRegionStats } from './types/mapTypes';
 
-const API_BASE = 'http://localhost:8080/api';
+// Используем относительный путь - Vite прокси будет перенаправлять на бэкенд
+const API_BASE = '/api';
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -10,21 +10,20 @@ const api = axios.create({
 });
 
 export const geoApi = {
-  getRegionsGeoJSON: async (): Promise<RegionsGeoJSON> => {
-    // ИСПРАВЛЕНО: убрал лишний /api
-    const response = await api.get<RegionsGeoJSON>('/geo/regions');
+  getRegionsGeoJSON: async (): Promise<IRegionsGeoJSON> => {
+    const response = await api.get<IRegionsGeoJSON>('/geo/regions');
     return response.data;
   },
 };
 
 export const regionsApi = {
-  getRegionStats: async (regionId: number): Promise<RegionStats> => {
-    const response = await api.get<RegionStats>(`/regions/${regionId}/stats`);
+  getRegionStats: async (regionId: number): Promise<IRegionStats> => {
+    const response = await api.get<IRegionStats>(`/regions/${regionId}/stats`);
     return response.data;
   },
 
-  getAllRegionsStats: async (regionIds: number[]): Promise<Map<number, RegionStats>> => {
-    const statsMap = new Map<number, RegionStats>();
+  getAllRegionsStats: async (regionIds: number[]): Promise<Map<number, IRegionStats>> => {
+    const statsMap = new Map<number, IRegionStats>();
     
     console.log(`Loading stats for all ${regionIds.length} regions...`);
     
@@ -49,18 +48,13 @@ export const regionsApi = {
         if (success && stats) {
           statsMap.set(regionId, stats);
           loadedCount++;
-          if (stats.totalFlights > 0) {
-            console.log(`✓ Region ${regionId}: ${stats.totalFlights} flights`);
-          }
         }
       });
       
       await new Promise(resolve => setTimeout(resolve, 300));
-      console.log(`Progress: ${Math.min(i + batchSize, regionIds.length)}/${regionIds.length} regions`);
     }
     
-    console.log(`✅ Loaded stats for ${loadedCount} regions total`);
-    console.log(`📊 Regions with flight data: ${Array.from(statsMap.values()).filter(s => s.totalFlights > 0).length}`);
+    console.log(`✅ Loaded stats for ${loadedCount} regions`);
     
     return statsMap;
   },

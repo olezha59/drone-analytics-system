@@ -1,0 +1,51 @@
+/* frontend/src/components/Map/RegionTooltip.css */
+.region-tooltip {
+  position: fixed;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  max-width: 280px;
+  pointer-events: none;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tooltip-header h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 4px;
+}
+
+.tooltip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.tooltip-row .label {
+  color: #666;
+  font-weight: 500;
+}
+
+.tooltip-row .value {
+  color: #1a1a1a;
+  font-weight: 600;
+}
