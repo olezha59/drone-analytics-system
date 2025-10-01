@@ -1,17 +1,9 @@
-import axios from 'axios';
-import type { IRegionsGeoJSON, IRegionStats } from './types/mapTypes';
-
-// Используем относительный путь - Vite прокси будет перенаправлять на бэкенд
-const API_BASE = '/api';
-
-const api = axios.create({
-  baseURL: API_BASE,
-  timeout: 30000,
-});
+import apiClient from '../api/apiClient';
 
 export const geoApi = {
-  getRegionsGeoJSON: async (): Promise<IRegionsGeoJSON> => {
-    const response = await api.get<IRegionsGeoJSON>('/geo/regions');
+  getRegionsGeoJSON: async () => {
+    console.log('🗺️ Fetching GeoJSON data via apiClient...');
+    const response = await apiClient.get('/analytics/regions-geojson');
     return response.data;
   },
 };
@@ -28,15 +20,16 @@ export const analyticsApi = {
 };
 
 export const regionsApi = {
-  getRegionStats: async (regionId: number): Promise<IRegionStats> => {
-    const response = await api.get<IRegionStats>(`/regions/${regionId}/stats`);
+  getRegionStats: async (regionId: number) => {
+    console.log(`📊 Fetching stats for region ${regionId} via apiClient...`);
+    const response = await apiClient.get(`/regions/${regionId}/stats`);
     return response.data;
   },
 
-  getAllRegionsStats: async (regionIds: number[]): Promise<Map<number, IRegionStats>> => {
-    const statsMap = new Map<number, IRegionStats>();
+  getAllRegionsStats: async (regionIds: number[]) => {
+    const statsMap = new Map();
     
-    console.log(`Loading stats for all ${regionIds.length} regions...`);
+    console.log(`Loading stats for all ${regionIds.length} regions via apiClient...`);
     
     const batchSize = 5;
     let loadedCount = 0;

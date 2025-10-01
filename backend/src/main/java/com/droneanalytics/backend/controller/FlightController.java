@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -28,12 +29,14 @@ public class FlightController {
     
     @Autowired 
     private RegionMappingService regionMappingService;
+
     
     /**
      * 📌 GET /api/flights
      * Получить все полеты с пагинацией (С ID региона)
      */
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<Page<FlightWithRegionDto>> getAllFlights(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -49,11 +52,13 @@ public class FlightController {
         return ResponseEntity.ok(flightDtos);
     }
     
+    
     /**
      * 📌 GET /api/flights/{id}
      * Получить полет по ID (С ID региона)
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<FlightWithRegionDto> getFlightById(@PathVariable UUID id) {
         Optional<FlightRecord> flight = flightService.getFlightById(id);
         return flight.map(f -> ResponseEntity.ok(new FlightWithRegionDto(f, regionMappingService)))
@@ -65,6 +70,7 @@ public class FlightController {
      * Поиск полетов по критериям (С ID региона)
      */
     @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<List<FlightWithRegionDto>> searchFlights(
             @RequestParam(required = false) String operator,
             @RequestParam(required = false) String region,
@@ -86,6 +92,7 @@ public class FlightController {
      * Получить все полеты оператора (С ID региона)
      */
     @GetMapping("/operator/{operatorName}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<List<FlightWithRegionDto>> getFlightsByOperator(@PathVariable String operatorName) {
         List<FlightRecord> flights = flightService.getFlightsByOperator(operatorName);
         
@@ -102,6 +109,7 @@ public class FlightController {
      * Получить все полеты в регионе (С ID региона)
      */
     @GetMapping("/region/{regionName}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<List<FlightWithRegionDto>> getFlightsByRegion(@PathVariable String regionName) {
         List<FlightRecord> flights = flightService.getFlightsByRegion(regionName);
         
@@ -118,6 +126,7 @@ public class FlightController {
      * Старая версия без ID региона (для обратной совместимости)
      */
     @GetMapping("/legacy")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<Page<FlightRecord>> getAllFlightsLegacy(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -125,5 +134,20 @@ public class FlightController {
         Pageable pageable = PageRequest.of(page, size);
         Page<FlightRecord> flights = flightService.getAllFlights(pageable);
         return ResponseEntity.ok(flights);
+    }
+    
+    /**
+     * 📌 DELETE /api/flights/{id}
+     * Удалить полет по ID (ТОЛЬКО для админов)
+     */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteFlight(@PathVariable UUID id) {
+        try {
+            flightService.deleteFlight(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

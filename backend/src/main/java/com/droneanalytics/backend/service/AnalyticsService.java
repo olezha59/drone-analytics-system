@@ -90,9 +90,9 @@ public class AnalyticsService {
         List<RegionStatsDto> regionStats = new ArrayList<>();
         
         // Пример данных (заглушка)
-        regionStats.add(new RegionStatsDto("Московская область", 234L, 25L, 130.5));
-        regionStats.add(new RegionStatsDto("Санкт-Петербург", 189L, 18L, 115.2));
-        regionStats.add(new RegionStatsDto("Краснодарский край", 156L, 12L, 95.7));
+     //   regionStats.add(new RegionStatsDto("Московская область", 234L, 25L, 130.5));
+      //  regionStats.add(new RegionStatsDto("Санкт-Петербург", 189L, 18L, 115.2));
+       // regionStats.add(new RegionStatsDto("Краснодарский край", 156L, 12L, 95.7));
         
         return regionStats.stream()
                          .limit(limit)
@@ -106,9 +106,9 @@ public class AnalyticsService {
         Map<String, Long> dailyStats = new HashMap<>();
         
         // Пример данных (заглушка)
-        dailyStats.put("2024-01-01", 45L);
-        dailyStats.put("2024-01-02", 52L);
-        dailyStats.put("2024-01-03", 38L);
+      //  dailyStats.put("2024-01-01", 45L);
+       // dailyStats.put("2024-01-02", 52L);
+       // dailyStats.put("2024-01-03", 38L);
         
         return dailyStats;
     }
@@ -125,9 +125,9 @@ public class AnalyticsService {
         
         // Пример: оператор -> количество полетов
         Map<String, Object> stat1 = new HashMap<>();
-        stat1.put("operatorName", "Аэроскан");
-        stat1.put("flightCount", 156L);
-        stat1.put("averageDuration", 125.5);
+       // stat1.put("operatorName", "Аэроскан");
+       // stat1.put("flightCount", 156L);
+       // stat1.put("averageDuration", 125.5);
         
         Map<String, Object> stat2 = new HashMap<>();
         stat2.put("operatorName", "Геоскан");
@@ -148,12 +148,12 @@ public class AnalyticsService {
         
         // Пример данных
         Map<String, Object> stat1 = new HashMap<>();
-        stat1.put("aircraftType", "DJI Phantom 4");
-        stat1.put("flightCount", 245L);
+       // stat1.put("aircraftType", "DJI Phantom 4");
+       // stat1.put("flightCount", 245L);
         
         Map<String, Object> stat2 = new HashMap<>();
-        stat2.put("aircraftType", "DJI Mavic 3");
-        stat2.put("flightCount", 189L);
+       // stat2.put("aircraftType", "DJI Mavic 3");
+       // stat2.put("flightCount", 189L);
         
         stats.add(stat1);
         stats.add(stat2);
