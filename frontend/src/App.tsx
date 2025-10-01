@@ -1,12 +1,17 @@
-// ~/drone-analytics-system/frontend/src/App.tsx
 import React from 'react';
 import DroneHeatMap from './components/Map/DroneHeatMap';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import LoginForm from './components/LoginForm';
 import './App.css';
 
 // Импортируем логотип
 import BrzTeamLogo from './assets/brzteam-logo.svg';
 
-function App() {
+// Компонент основного контента (после авторизации)
+const AppContent: React.FC = () => {
+  const { user, logout } = useAuth();
+
   return (
     <div className="App">
       <header className="app-header">
@@ -25,13 +30,49 @@ function App() {
               </p>
             </div>
           </div>
+
+          {/* Блок пользователя (справа) */}
+          {user && (
+            <div className="user-section">
+              <span className="user-info">
+                {user.username} ({user.role === 'ADMIN' ? 'Администратор' : 'Аналитик'})
+              </span>
+              <button 
+                onClick={logout}
+                className="logout-button"
+                style={{
+                  marginLeft: '10px',
+                  padding: '5px 10px',
+                  background: '#ff4d4f',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Выйти
+              </button>
+            </div>
+          )}
         </div>
       </header>
+
       <main>
-        <DroneHeatMap />
+        <ProtectedRoute>
+          <DroneHeatMap />
+        </ProtectedRoute>
       </main>
     </div>
   );
-}
+};
+
+// Главный компонент с провайдером аутентификации
+const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+};
 
 export default App;

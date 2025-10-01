@@ -5,6 +5,7 @@ import com.droneanalytics.backend.service.AnalyticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.core.io.Resource;
@@ -37,6 +38,7 @@ public class AnalyticsController {
      * Аналитика полетов по регионам за период
      */
     @GetMapping("/regions")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<RegionAnalyticsDto> getRegionAnalytics(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {
@@ -54,6 +56,7 @@ public class AnalyticsController {
      * Статистика по операторам
      */
     @GetMapping("/operators")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<List<Map<String, Object>>> getOperatorAnalytics(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {
@@ -71,6 +74,7 @@ public class AnalyticsController {
      * Количество полетов по дням
      */
     @GetMapping("/daily")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<Map<String, Long>> getDailyFlights(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {
@@ -88,6 +92,7 @@ public class AnalyticsController {
      * Топ регионов по количеству полетов
      */
     @GetMapping("/top-regions")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<List<Map<String, Object>>> getTopRegions(
             @RequestParam(defaultValue = "10") int limit) {
         
@@ -108,6 +113,7 @@ public class AnalyticsController {
      * Общая сводка по всем данным
      */
     @GetMapping("/summary")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<Map<String, Object>> getSummary() {
         try {
             Map<String, Object> summary = analyticsService.getSystemSummary();
@@ -122,6 +128,7 @@ public class AnalyticsController {
      * Статистика по типам воздушных судов
      */
     @GetMapping("/aircraft-types")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<List<Map<String, Object>>> getAircraftTypeStats() {
         try {
             List<Map<String, Object>> stats = analyticsService.getAircraftTypeStats();
@@ -130,7 +137,13 @@ public class AnalyticsController {
             return ResponseEntity.badRequest().build();
         }
     }
+    
+    /**
+     * 📌 GET /api/analytics/regions-geojson
+     * Получить GeoJSON с регионами
+     */
     @GetMapping("/regions-geojson")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<String> getRegionsGeoJSON() {
         try {
             Resource resource = new ClassPathResource("geo/regions.geojson");

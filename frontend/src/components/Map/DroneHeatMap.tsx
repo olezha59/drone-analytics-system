@@ -9,14 +9,15 @@ import './DroneHeatMap.css';
 import RegionTooltip from './RegionTooltip';
 import RegionDetails from '../Analytics/RegionDetails';
 import RegionsSidebar from './RegionsSidebar';
+import { useAuth } from '../../context/AuthContext';
 
 // Импорт словаря названий регионов
 import regionNames from '../../data/regionNames';
 
 // Границы карты России для ограничения области просмотра
 const RUSSIA_BOUNDS: [[number, number], [number, number]] = [
-  [35.0, 19.0],  // Юго-запад (было 41.0 - теперь ниже)
-  [82.0, 190.0]  // Северо-восток (немного правее)
+  [35.0, 19.0],
+  [82.0, 190.0]
 ];
 
 interface TooltipData {
@@ -83,6 +84,7 @@ const DroneHeatMap: React.FC = () => {
   const [regionStats, setRegionStats] = useState<IRegionStats | null>(null);
   const [selectedRegionName, setSelectedRegionName] = useState<string>('');
   const [hoveredRegionId, setHoveredRegionId] = useState<number | null>(null);
+  const { user } = useAuth();
 
   // Загрузка данных
   useEffect(() => {
@@ -93,6 +95,8 @@ const DroneHeatMap: React.FC = () => {
         setProgress(0);
 
         console.log('🔄 Загрузка GeoJSON...');
+        console.log('👤 Current user:', user?.username);
+        
         const geoData = await geoApi.getRegionsGeoJSON();
         setProgress(30);
 
@@ -124,12 +128,14 @@ const DroneHeatMap: React.FC = () => {
       }
     };
 
-    loadData();
-  }, []);
+    if (user) {
+      loadData();
+    }
+  }, [user]);
 
   // Загрузка статистики региона при клике
   useEffect(() => {
-    if (selectedRegionId) {
+    if (selectedRegionId && user) {
       const loadRegionStats = async () => {
         try {
           const stats = await regionsApi.getRegionStats(selectedRegionId);
@@ -140,7 +146,7 @@ const DroneHeatMap: React.FC = () => {
       };
       loadRegionStats();
     }
-  }, [selectedRegionId]);
+  }, [selectedRegionId, user]);
 
   // Обработчик наведения на регион
   const handleRegionHover = useCallback((feature: any, event: any) => {
@@ -241,27 +247,11 @@ const DroneHeatMap: React.FC = () => {
     };
   };
 
-  // Обработчик для каждого региона - УБИРАЕМ POPUP
+  // Обработчик для каждого региона
   const onEachFeature = (feature: any, layer: any) => {
     const props = feature.properties;
     const regionId = feature.id;
 
-    // УБИРАЕМ ВСПЛЫВАЮЩУЮ ПОДСКАЗКУ ПРИ КЛИКЕ
-    // const russianName = regionNames[regionId as keyof typeof regionNames] || `Регион ${regionId}`;
-    // const popupContent = `
-    //   <div style="padding: 8px; min-width: 250px;">
-    //     <h3 style="margin: 0 0 8px 0; color: #333; border-bottom: 1px solid #eee; padding-bottom: 4px;">
-    //       ${russianName}
-    //     </h3>
-    //     <div style="font-size: 14px;">
-    //       <p style="margin: 4px 0;"><strong>ID региона:</strong> ${regionId}</p>
-    //       <p style="margin: 4px 0;"><strong>Всего полетов:</strong> ${props.totalFlights || 0}</p>
-    //       ${props.uniqueOperators ? `<p style="margin: 4px 0;"><strong>Операторов:</strong> ${props.uniqueOperators}</p>` : ''}
-    //     </div>
-    //   </div>
-    // `;
-    // layer.bindPopup(popupContent);
-    
     layer.on('mouseover', (e: any) => {
       handleRegionHover(feature, e);
       layer.setStyle({

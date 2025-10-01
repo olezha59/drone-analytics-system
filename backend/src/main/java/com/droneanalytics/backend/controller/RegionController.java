@@ -9,6 +9,7 @@ import com.droneanalytics.backend.service.RegionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -40,6 +41,7 @@ public class RegionController {
      * 📌 GET /api/regions - УПРОЩЕННАЯ ВЕРСИЯ БЕЗ ГЕОДАННЫХ
      */
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<List<Map<String, Object>>> getAllRegions() {
         try {
             List<RussianRegion> regions = regionService.getAllRegions();
@@ -70,6 +72,7 @@ public class RegionController {
      * 📌 GET /api/regions/{id} - РЕГИОН ПО ID БЕЗ ГЕОДАННЫХ
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<Map<String, Object>> getRegionById(@PathVariable Long id) {
         Optional<RussianRegion> region = regionService.getRegionById(id);
         
@@ -94,6 +97,7 @@ public class RegionController {
      * 📌 GET /api/regions/name/{name} - РЕГИОН ПО НАЗВАНИЮ БЕЗ ГЕОДАННЫХ
      */
     @GetMapping("/name/{name}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<Map<String, Object>> getRegionByName(@PathVariable String name) {
         Optional<RussianRegion> region = regionService.getRegionByName(name);
         
@@ -118,6 +122,7 @@ public class RegionController {
      * Получить все полеты в регионе по ID региона (через center_code маппинг)
      */
     @GetMapping("/{id}/flights")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<List<FlightWithRegionDto>> getFlightsByRegionId(@PathVariable Long id) {
         // Найти все center_code, которые соответствуют этому region_id
         List<String> centerCodesForRegion = regionMappingService.getCenterCodesByRegionId(id);
@@ -141,6 +146,7 @@ public class RegionController {
      * Получить все полеты в регионе по названию региона (через center_code маппинг)
      */
     @GetMapping("/name/{name}/flights")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<List<FlightWithRegionDto>> getFlightsByRegionName(@PathVariable String name) {
         // Сначала найти регион по имени
         Optional<RussianRegion> region = regionService.getRegionByName(name);
@@ -160,6 +166,7 @@ public class RegionController {
      * Получить статистику полетов по ID региона за период
      */
     @GetMapping("/{id}/stats")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<Map<String, Object>> getRegionStats(
             @PathVariable Long id,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -249,6 +256,7 @@ public class RegionController {
      * Получить статистику полетов по названию региона за период
      */
     @GetMapping("/name/{name}/stats")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<Map<String, Object>> getRegionStatsByName(
             @PathVariable String name,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
