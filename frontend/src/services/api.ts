@@ -15,6 +15,17 @@ export const geoApi = {
     return response.data;
   },
 };
+export const analyticsApi = {
+  getRussiaSummary: async (): Promise<{
+    totalOperators: number;
+    dataLastUpdated: string;
+    totalRegions: number;
+    totalFlights: number;
+  }> => {
+    const response = await api.get('/analytics/summary');
+    return response.data;
+  },
+};
 
 export const regionsApi = {
   getRegionStats: async (regionId: number): Promise<IRegionStats> => {

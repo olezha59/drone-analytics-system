@@ -75,28 +75,32 @@ const RegionsSidebar: React.FC<RegionsSidebarProps> = ({
         />
       </div>
 
-      {/* Статистика */}
-      <div className="sidebar-stats">
-        <div className="stat-item">
-          <span>Всего регионов:</span>
-          <span className="stat-value">{regions.length}</span>
-        </div>
-        <div className="stat-item">
-          <span>С данными:</span>
-          <span className="stat-value">
-            {regions.filter(r => r.totalFlights > 0).length}
-          </span>
+      {/* Статистика по РФ */}
+      <div className="russia-stats">
+        <h4>📊 Статистика по РФ</h4>
+        <div className="russia-stats-grid">
+          <div className="russia-stat">
+            <div className="russia-stat-value">{regions.length}</div>
+            <div className="russia-stat-label">Регионов</div>
+          </div>
+          <div className="russia-stat">
+            <div className="russia-stat-value">
+              {regions.reduce((sum, region) => sum + region.totalFlights, 0).toLocaleString()}
+            </div>
+            <div className="russia-stat-label">Всего полетов</div>
+          </div>
         </div>
       </div>
 
       {/* Список регионов */}
       <div className="regions-list">
         <div className="list-header">
+          <span>#</span>
           <span>Регион</span>
           <span>Полетов</span>
         </div>
         <div className="regions-scrollable">
-          {filteredRegions.map(region => (
+          {filteredRegions.map((region, index) => (
             <div
               key={region.id}
               className={`region-item ${
@@ -106,6 +110,7 @@ const RegionsSidebar: React.FC<RegionsSidebarProps> = ({
               onMouseEnter={() => onRegionHover(region.id)}
               onMouseLeave={onRegionLeave}
             >
+              <div className="region-number">{index + 1}</div>
               <div className="region-info">
                 <div 
                   className="region-color"
