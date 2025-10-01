@@ -1,0 +1,73 @@
+// frontend/src/components/Map/HeatMapLegend.tsx
+import React from 'react';
+import { getColorByValue } from '../../utils/dataProcessor';
+
+interface HeatMapLegendProps {
+  minFlights: number;
+  maxFlights: number;
+  totalRegions: number;
+  regionsWithData: number;
+  totalRussiaFlights?: number;
+  averageRussiaDuration?: number;
+}
+
+const HeatMapLegend: React.FC<HeatMapLegendProps> = ({ 
+  minFlights, 
+  maxFlights, 
+  totalRegions, 
+  regionsWithData,
+  totalRussiaFlights,
+  averageRussiaDuration
+}) => {
+  const gradientStops = [0, 0.25, 0.5, 0.75, 1].map(value => ({
+    value,
+    color: getColorByValue(value),
+    label: value === 0 ? '0' : value === 1 ? 'Макс' : `${Math.round(value * 100)}%`
+  }));
+
+  return (
+    <div className="heatmap-legend">
+      <div className="legend-section">
+        <h4>Статистика по РФ</h4>
+        <div className="russia-stats">
+          {totalRussiaFlights && (
+            <div className="stat-item">
+              <span className="stat-label">Всего полетов:</span>
+              <span className="stat-value">{totalRussiaFlights.toLocaleString()}</span>
+            </div>
+          )}
+          {averageRussiaDuration && (
+            <div className="stat-item">
+              <span className="stat-label">Ср. длительность:</span>
+              <span className="stat-value">{averageRussiaDuration.toFixed(1)} мин</span>
+            </div>
+          )}
+          <div className="stat-item">
+            <span className="stat-label">Регионы с данными:</span>
+            <span className="stat-value">{regionsWithData}/{totalRegions}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="legend-section">
+        <h4>Тепловая карта полетов</h4>
+        <div className="gradient-legend">
+          {gradientStops.map((stop, index) => (
+            <div key={index} className="gradient-item">
+              <div
+                className="gradient-color"
+                style={{ backgroundColor: stop.color }}
+              />
+              <span className="gradient-label">{stop.label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="legend-footer">
+          <p>Диапазон: {minFlights} - {maxFlights} полетов</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default HeatMapLegend;

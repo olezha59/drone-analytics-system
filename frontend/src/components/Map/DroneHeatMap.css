@@ -1,4 +1,4 @@
-/* ~/drone-analytics-system/frontend/src/components/Map/DroneHeatMap.css */
+/* frontend/src/components/Map/DroneHeatMap.css */
 .drone-heatmap-container {
   height: 100% !important;
   width: 100% !important;
@@ -31,7 +31,7 @@
 
 .progress-fill {
   height: 100%;
-  background: #007bff;
+  background: linear-gradient(90deg, #1e3a8a, #3730a3);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -54,20 +54,40 @@
 }
 
 .retry-button {
-  background: #007bff;
+  background: linear-gradient(135deg, #1e3a8a, #3730a3);
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
   margin-top: 1rem;
+  font-weight: 500;
+  transition: all 0.2s;
 }
 
 .retry-button:hover {
-  background: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(30, 58, 138, 0.3);
 }
 
 /* Убедимся что карта занимает всю высоту */
 .leaflet-container {
   height: 100% !important;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Скрыть атрибуцию Leaflet */
+.leaflet-control-attribution {
+  display: none !important;
+}
+
+/* Стили для попапов */
+.leaflet-popup-content {
+  margin: 8px 12px;
+  font-family: 'Arial', sans-serif;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
