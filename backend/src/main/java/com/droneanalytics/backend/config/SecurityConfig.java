@@ -30,9 +30,23 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
+                // 🔓 Публичные endpoints (без аутентификации)
+                .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
+                
+                // 📚 Swagger UI - разрешаем без аутентификации
+                .requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-ui.html").permitAll()
+                
+                // Разрешаем OPTIONS запросы для CORS preflight
+                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                
+                // 🔐 Защищенные endpoints (требуют аутентификации)
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/**").authenticated()
+                
+                // Все остальные запросы
                 .anyRequest().permitAll()
             )
             .sessionManagement(session -> session

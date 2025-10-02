@@ -3,6 +3,12 @@ package com.droneanalytics.backend.controller;
 import com.droneanalytics.backend.entity.FlightRecord;
 import com.droneanalytics.backend.service.FlightService;
 import com.droneanalytics.backend.service.RegionMappingService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +23,8 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/regions")
 @CrossOrigin(origins = "http://localhost:5173")
+@Tag(name = "Регионы", description = "API для работы с регионами и статистикой полетов")
+@SecurityRequirement(name = "bearerAuth")
 public class RegionController {
 
     @Autowired
@@ -31,11 +39,23 @@ public class RegionController {
      * 📌 GET /api/regions/{id}/stats
      * Получить статистику полетов по ID региона за период
      */
+    @Operation(summary = "Получить статистику по региону", description = "Возвращает детальную статистику полетов для указанного региона за период")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Статистика успешно получена"),
+        @ApiResponse(responseCode = "401", description = "Требуется аутентификация"),
+        @ApiResponse(responseCode = "403", description = "Недостаточно прав"),
+        @ApiResponse(responseCode = "404", description = "Регион не найден")
+    })
     @GetMapping("/{id}/stats")
     @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<Map<String, Object>> getRegionStats(
+            @Parameter(description = "ID региона", example = "1") 
             @PathVariable Long id,
+            
+            @Parameter(description = "Дата начала периода (ГГГГ-ММ-ДД)", example = "2024-01-01") 
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            
+            @Parameter(description = "Дата окончания периода (ГГГГ-ММ-ДД)", example = "2024-12-31") 
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         
         // Найти все center_code, которые соответствуют этому region_id
