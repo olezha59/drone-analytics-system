@@ -6,11 +6,11 @@ import com.droneanalytics.backend.entity.FlightRecord;
 import com.droneanalytics.backend.entity.RussianRegion;
 import com.droneanalytics.backend.repository.FlightRecordRepository;
 import com.droneanalytics.backend.repository.RussianRegionRepository;
-import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +32,6 @@ public class AnalyticsService {
 
     /**
      * 📌 ОСНОВНОЙ МЕТОД: Аналитика полетов по регионам за период
-     * Этот метод будет вызываться когда пользователь выбирает период в веб-интерфейсе
      */
     public RegionAnalyticsDto getRegionAnalytics(LocalDate start, LocalDate end) {
         
@@ -84,16 +83,7 @@ public class AnalyticsService {
      * 📌 Топ регионов по количеству полетов
      */
     private List<RegionStatsDto> getTopRegionsStats(LocalDate start, LocalDate end, int limit) {
-        // Здесь будет сложный запрос с JOIN и группировкой
-        // Пока используем упрощенную логику
-        
         List<RegionStatsDto> regionStats = new ArrayList<>();
-        
-        // Пример данных (заглушка)
-     //   regionStats.add(new RegionStatsDto("Московская область", 234L, 25L, 130.5));
-      //  regionStats.add(new RegionStatsDto("Санкт-Петербург", 189L, 18L, 115.2));
-       // regionStats.add(new RegionStatsDto("Краснодарский край", 156L, 12L, 95.7));
-        
         return regionStats.stream()
                          .limit(limit)
                          .collect(Collectors.toList());
@@ -104,12 +94,6 @@ public class AnalyticsService {
      */
     private Map<String, Long> getFlightsByDate(LocalDate start, LocalDate end) {
         Map<String, Long> dailyStats = new HashMap<>();
-        
-        // Пример данных (заглушка)
-      //  dailyStats.put("2024-01-01", 45L);
-       // dailyStats.put("2024-01-02", 52L);
-       // dailyStats.put("2024-01-03", 38L);
-        
         return dailyStats;
     }
 
@@ -122,21 +106,6 @@ public class AnalyticsService {
      */
     public List<Map<String, Object>> getOperatorStats(LocalDate start, LocalDate end) {
         List<Map<String, Object>> stats = new ArrayList<>();
-        
-        // Пример: оператор -> количество полетов
-        Map<String, Object> stat1 = new HashMap<>();
-       // stat1.put("operatorName", "Аэроскан");
-       // stat1.put("flightCount", 156L);
-       // stat1.put("averageDuration", 125.5);
-        
-        Map<String, Object> stat2 = new HashMap<>();
-        stat2.put("operatorName", "Геоскан");
-        stat2.put("flightCount", 89L);
-        stat2.put("averageDuration", 95.2);
-        
-        stats.add(stat1);
-        stats.add(stat2);
-        
         return stats;
     }
 
@@ -145,24 +114,11 @@ public class AnalyticsService {
      */
     public List<Map<String, Object>> getAircraftTypeStats() {
         List<Map<String, Object>> stats = new ArrayList<>();
-        
-        // Пример данных
-        Map<String, Object> stat1 = new HashMap<>();
-       // stat1.put("aircraftType", "DJI Phantom 4");
-       // stat1.put("flightCount", 245L);
-        
-        Map<String, Object> stat2 = new HashMap<>();
-       // stat2.put("aircraftType", "DJI Mavic 3");
-       // stat2.put("flightCount", 189L);
-        
-        stats.add(stat1);
-        stats.add(stat2);
-        
         return stats;
     }
 
     /**
-     * 📌 Общая сводка системы
+     * 📌 Общая сводка системы С ДОБАВЛЕНИЕМ СТАТИСТИКИ ПО ВРЕМЕНИ СУТОК
      */
     public Map<String, Object> getSystemSummary() {
         Map<String, Object> summary = new HashMap<>();
@@ -176,16 +132,59 @@ public class AnalyticsService {
         summary.put("totalRegions", totalRegions);
         summary.put("dataLastUpdated", LocalDate.now().toString());
         
+        // 🆕 ДОБАВЛЯЕМ СТАТИСТИКУ ПО ВРЕМЕНИ СУТОК ДЛЯ ВСЕЙ РФ
+        Map<String, Long> russiaDailyActivity = calculateRussiaDailyActivity();
+        summary.put("dailyActivity", russiaDailyActivity);
+        
         return summary;
+    }
+
+    /**
+     * 🆕 РАСЧЕТ СУТОЧНОЙ АКТИВНОСТИ ДЛЯ ВСЕЙ РФ
+     */
+    private Map<String, Long> calculateRussiaDailyActivity() {
+        // Получаем все полеты с временем взлета
+        List<FlightRecord> allFlights = flightRecordRepository.findAll();
+        
+        Map<String, Long> activity = new HashMap<>();
+        activity.put("morning", 0L);    // 06:00 - 11:59
+        activity.put("day", 0L);        // 12:00 - 17:59  
+        activity.put("evening", 0L);    // 18:00 - 23:59
+        activity.put("night", 0L);      // 00:00 - 05:59
+        
+        System.out.println("🔍 Расчет суточной активности для " + allFlights.size() + " полетов");
+        
+        for (FlightRecord flight : allFlights) {
+            if (flight.getTakeoffTime() == null) {
+                continue;
+            }
+            
+            LocalDateTime takeoffTime = flight.getTakeoffTime();
+            int hour = takeoffTime.getHour();
+            String timeOfDay;
+            
+            if (hour >= 6 && hour < 12) {
+                timeOfDay = "morning";
+            } else if (hour >= 12 && hour < 18) {
+                timeOfDay = "day";
+            } else if (hour >= 18 && hour < 24) {
+                timeOfDay = "evening";
+            } else {
+                timeOfDay = "night";
+            }
+            
+            activity.put(timeOfDay, activity.get(timeOfDay) + 1);
+        }
+        
+        System.out.println("📊 Результат расчета суточной активности: " + activity);
+        
+        return activity;
     }
 
     /**
      * 📌 Статистика полетов по дням
      */
     public Map<String, Long> getDailyFlightStats(LocalDate start, LocalDate end) {
-        // Здесь будет сложный SQL запрос с группировкой по дате
-        // Пока возвращаем пример данных
-        
         Map<String, Long> dailyStats = new HashMap<>();
         LocalDate current = start;
         
@@ -202,21 +201,6 @@ public class AnalyticsService {
      */
     public List<Map<String, Object>> getTopRegions(int limit) {
         List<Map<String, Object>> topRegions = new ArrayList<>();
-        
-        // Пример данных
-        Map<String, Object> region1 = new HashMap<>();
-        region1.put("regionName", "Московская область");
-        region1.put("flightCount", 234L);
-        region1.put("operatorCount", 25L);
-        
-        Map<String, Object> region2 = new HashMap<>();
-        region2.put("regionName", "Санкт-Петербург");
-        region2.put("flightCount", 189L);
-        region2.put("operatorCount", 18L);
-        
-        topRegions.add(region1);
-        topRegions.add(region2);
-        
         return topRegions.stream().limit(limit).collect(Collectors.toList());
     }
 }

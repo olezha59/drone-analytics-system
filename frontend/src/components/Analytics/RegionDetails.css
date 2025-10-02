@@ -84,7 +84,7 @@
 .stat-card.main-stat .stat-value {
   font-size: 2.2em;
   font-weight: 700;
-  color: #10b981 !important; /* ЗЕЛЕНЫЙ цвет для количества полетов */
+  color: #10b981 !important;
 }
 
 .stat-value {
@@ -93,14 +93,12 @@
   margin-bottom: 4px;
 }
 
-/* ЗЕЛЕНЫЙ цвет для числа полетов в главной карточке */
 .stat-card.main-stat .stat-value {
   color: #10b981 !important;
 }
 
-/* ЧЕРНЫЙ цвет для подписей в обычных карточках */
 .stat-card:not(.main-stat) .stat-label {
-  color: #1a1a1a !important; /* ЧЕРНЫЙ вместо белого */
+  color: #1a1a1a !important;
   font-weight: 600;
 }
 
@@ -110,7 +108,6 @@
   font-weight: 500;
 }
 
-/* Белый текст для главной карточки */
 .stat-card.main-stat .stat-label {
   color: white;
   opacity: 0.9;
@@ -180,6 +177,25 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
+/* 🆕 СТИЛИ ДЛЯ ГРАФИКА ПО ГОДАМ */
+.yearly-distribution {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e1e8ed;
+}
+
+.yearly-chart {
+  width: 100%;
+}
+
+.yearly-chart h4 {
+  margin: 0 0 15px 0;
+  color: #1a1a1a;
+  font-size: 1.1em;
+}
+
 .centers-info {
   margin-top: 20px;
 }
@@ -223,4 +239,54 @@
   .stats-grid {
     grid-template-columns: 1fr;
   }
+  
+  .yearly-distribution {
+    padding: 10px;
+  }
+}
+
+/* 🆕 Стили для самого активного года */
+.most-active-year {
+  margin: 20px 0;
+  padding: 15px;
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+}
+
+.most-active-year h4 {
+  margin: 0 0 10px 0;
+  color: #856404;
+  font-size: 16px;
+}
+
+.active-year-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.year-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.year-flights {
+  font-size: 16px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* 🆕 Стили для графика по годам */
+.yearly-distribution {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
 }

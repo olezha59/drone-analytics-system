@@ -40,17 +40,23 @@ const Header: React.FC = () => {
     },
   };
 
-  const userMenu = (
-    <Menu>
-      <Menu.Item key="user" icon={<UserOutlined />}>
-        {user?.username} ({user?.role === 'ADMIN' ? 'Администратор' : 'Аналитик'})
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={logout}>
-        Выйти
-      </Menu.Item>
-    </Menu>
-  );
+  // 🆕 ИСПРАВЛЯЕМ ПРЕДУПРЕЖДЕНИЕ - используем menu вместо overlay
+  const userMenuItems = [
+    {
+      key: 'user',
+      icon: <UserOutlined />,
+      label: `${user?.username} (${user?.role === 'ADMIN' ? 'Администратор' : 'Аналитик'})`
+    },
+    {
+      type: 'divider' as const,
+    },
+    {
+      key: 'logout',
+      icon: <LogoutOutlined />,
+      label: 'Выйти',
+      onClick: logout
+    }
+  ];
 
   return (
     <AntHeader style={{ 
@@ -84,7 +90,10 @@ const Header: React.FC = () => {
         )}
 
         {user ? (
-          <Dropdown overlay={userMenu} placement="bottomRight">
+          <Dropdown 
+            menu={{ items: userMenuItems }} // 🆕 ИСПОЛЬЗУЕМ menu вместо overlay
+            placement="bottomRight"
+          >
             <Button 
               type="text" 
               style={{ color: 'white' }}

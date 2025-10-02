@@ -1,8 +1,7 @@
-// frontend/src/components/Analytics/RegionDetails.tsx
 import React from 'react';
 import './RegionDetails.css';
+import YearlyChart from './YearlyChart';
 
-// ВРЕМЕННО: Типы прямо здесь чтобы обойти баг Vite
 interface IRegionStats {
   regionId: number;
   uniqueOperators?: number;
@@ -26,6 +25,12 @@ interface IRegionStats {
     averageFlightsPerDay: number;
     totalDaysInPeriod: number;
   };
+  yearlyDistribution?: Record<number, number>;
+  // 🆕 ДОБАВЛЯЕМ ПОЛЕ ДЛЯ САМОГО АКТИВНОГО ГОДА
+  mostActiveYear?: {
+    year: number;
+    flightsCount: number;
+  };
 }
 
 interface RegionDetailsProps {
@@ -43,7 +48,6 @@ const RegionDetails: React.FC<RegionDetailsProps> = ({ regionStats, regionName, 
     );
   }
 
-  // Функция для получения самого популярного дрона
   const getPopularDrone = (): string => {
     if (!regionStats.flightsByAircraftType) return 'N/A';
     const types = Object.entries(regionStats.flightsByAircraftType);
@@ -51,7 +55,6 @@ const RegionDetails: React.FC<RegionDetailsProps> = ({ regionStats, regionName, 
     return types.sort(([,a], [,b]) => b - a)[0][0];
   };
 
-  // Функция для форматирования суточной активности
   const formatDailyActivity = () => {
     if (!regionStats.dailyActivity) return null;
     
@@ -99,7 +102,6 @@ const RegionDetails: React.FC<RegionDetailsProps> = ({ regionStats, regionName, 
           <div className="stat-label">Ср. длительность (мин)</div>
         </div>
 
-        {/* ДОБАВЛЯЕМ СУТОЧНУЮ АКТИВНОСТЬ В АБСОЛЮТНЫХ ЧИСЛАХ */}
         {regionStats.dailyActivity && (
           <>
             <div className="stat-card">
@@ -113,6 +115,10 @@ const RegionDetails: React.FC<RegionDetailsProps> = ({ regionStats, regionName, 
             <div className="stat-card">
               <div className="stat-value">{regionStats.dailyActivity.evening || 0}</div>
               <div className="stat-label">Вечером (18-24)</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">{regionStats.dailyActivity.night || 0}</div>
+              <div className="stat-label">Ночью (0-6)</div>
             </div>
           </>
         )}
@@ -185,6 +191,24 @@ const RegionDetails: React.FC<RegionDetailsProps> = ({ regionStats, regionName, 
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 🆕 ГРАФИК РАСПРЕДЕЛЕНИЯ ПО ГОДАМ */}
+      {regionStats.yearlyDistribution && (
+        <div className="yearly-distribution">
+          <YearlyChart yearlyDistribution={regionStats.yearlyDistribution} />
+        </div>
+      )}
+
+      {/* 🆕 САМЫЙ АКТИВНЫЙ ГОД */}
+      {regionStats.mostActiveYear && (
+        <div className="most-active-year">
+          <h4>🎯 Самый насыщенный по полетам год</h4>
+          <div className="active-year-card">
+            <div className="year-value">{regionStats.mostActiveYear.year}</div>
+            <div className="year-flights">{regionStats.mostActiveYear.flightsCount?.toLocaleString()} полетов</div>
           </div>
         </div>
       )}

@@ -30,36 +30,8 @@ export interface IRegionStats {
     monthBetween: number;
     changePercentage: number;
   };
+  // 🆕 ДОБАВЛЯЕМ РАСПРЕДЕЛЕНИЕ ПО ГОДАМ
+  yearlyDistribution?: Record<number, number>;
 }
 
-export interface IRegionFeatureProperties {
-  id: number;
-  name?: string;
-  totalFlights?: number;
-  uniqueOperators?: number;
-  averageFlightDuration?: number;
-  normalizedValue?: number;
-  color?: string;
-  flightsByAircraftType?: Record<string, number>;
-  centerCodes?: string[];
-}
-
-export interface IRegionFeature {
-  type: "Feature";
-  id: number;
-  geometry: {
-    type: "MultiPolygon";
-    coordinates: number[][][][];
-  };
-  properties: IRegionFeatureProperties;
-}
-
-export interface IRegionsGeoJSON {
-  type: "FeatureCollection";
-  features: IRegionFeature[];
-}
-
-export type Region = {
-  id: number;
-  name: string;
-};
+// ... остальные типы без изменений ...

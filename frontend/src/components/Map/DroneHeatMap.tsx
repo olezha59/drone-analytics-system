@@ -1,13 +1,15 @@
 // frontend/src/components/Map/DroneHeatMap.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
-import { geoApi, regionsApi } from '../../services/api';
+import { Button } from 'antd';
+import { geoApi, regionsApi, analyticsApi } from '../../services/api';
 import { processRegionData } from '../../utils/dataProcessor';
 import type { IRegionsGeoJSON, IRegionStats } from '../../types/mapTypes';
 import 'leaflet/dist/leaflet.css';
 import './DroneHeatMap.css';
 import RegionTooltip from './RegionTooltip';
 import RegionDetails from '../Analytics/RegionDetails';
+import RussiaStats from '../Analytics/RussiaStats';
 import RegionsSidebar from './RegionsSidebar';
 import { useAuth } from '../../context/AuthContext';
 
@@ -86,6 +88,10 @@ const DroneHeatMap: React.FC = () => {
   const [hoveredRegionId, setHoveredRegionId] = useState<number | null>(null);
   const { user } = useAuth();
 
+  // 🆕 ДОБАВЛЯЕМ СОСТОЯНИЕ ДЛЯ СТАТИСТИКИ РФ И КНОПКИ
+  const [russiaStats, setRussiaStats] = useState<any>(null);
+  const [showRussiaStats, setShowRussiaStats] = useState<boolean>(false);
+
   // Загрузка данных
   useEffect(() => {
     const loadData = async () => {
@@ -94,16 +100,16 @@ const DroneHeatMap: React.FC = () => {
         setError(null);
         setProgress(0);
 
-        console.log('🔄 Загрузка GeoJSON...');
-        console.log('👤 Current user:', user?.username);
+        console.log('🔄 Загрузка данных...');
         
-        const geoData = await geoApi.getRegionsGeoJSON();
         setProgress(30);
-
+        const geoData = await geoApi.getRegionsGeoJSON();
+        setProgress(50);
+        
         const regionIds = geoData.features.map(feature => feature.id);
         console.log(`📍 Найдено регионов: ${regionIds.length}`);
         
-        setProgress(50);
+        setProgress(70);
         console.log('📊 Загрузка статистики регионов...');
         const statsMap = await regionsApi.getAllRegionsStats(regionIds);
         setProgress(80);
@@ -112,6 +118,7 @@ const DroneHeatMap: React.FC = () => {
 
         const processed = processRegionData(geoData, statsMap);
         setProcessedData(processed);
+        
         setProgress(100);
 
         if (processed.regionsWithData === 0) {
@@ -132,6 +139,19 @@ const DroneHeatMap: React.FC = () => {
       loadData();
     }
   }, [user]);
+
+  // 🆕 ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ СТАТИСТИКИ РФ
+  const loadRussiaStats = async () => {
+    try {
+      console.log('🔄 Загрузка статистики РФ...');
+      const russiaData = await analyticsApi.getRussiaSummary();
+      setRussiaStats(russiaData);
+      setShowRussiaStats(true);
+      console.log('✅ Статистика РФ загружена:', russiaData);
+    } catch (err) {
+      console.error('❌ Ошибка загрузки статистики РФ:', err);
+    }
+  };
 
   // Загрузка статистики региона при клике
   useEffect(() => {
@@ -207,6 +227,11 @@ const DroneHeatMap: React.FC = () => {
   const handleCloseDetails = useCallback(() => {
     setSelectedRegionId(null);
     setRegionStats(null);
+  }, []);
+
+  // 🆕 ЗАКРЫТИЕ СТАТИСТИКИ РФ
+  const handleCloseRussiaStats = useCallback(() => {
+    setShowRussiaStats(false);
   }, []);
 
   // Стиль для регионов
@@ -350,13 +375,56 @@ const DroneHeatMap: React.FC = () => {
         />
       )}
       
-      {/* Детальная статистика региона (слева) */}
-      {selectedRegionId && regionStats && (
+      {/* 🆕 КНОПКА ДЛЯ СТАТИСТИКИ РФ */}
+      {!showRussiaStats && (
         <div style={{
           position: 'absolute',
           top: '20px',
           left: '20px',
-          maxHeight: '80vh',
+          zIndex: 1000
+        }}>
+          <Button 
+            type="primary"
+            size="large"
+            onClick={loadRussiaStats}
+            style={{
+              background: 'linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%)',
+              border: 'none',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+            }}
+          >
+            📊 Статистика по РФ
+          </Button>
+        </div>
+      )}
+      
+      {/* 🆕 СТАТИСТИКА РФ (появляется после нажатия кнопки) */}
+      {showRussiaStats && russiaStats && (
+        <div style={{
+          position: 'absolute',
+          top: '20px',
+          left: '20px',
+          zIndex: 1000,
+          maxWidth: '400px'
+        }}>
+          <RussiaStats 
+            totalFlights={russiaStats.totalFlights}
+            totalOperators={russiaStats.totalOperators}
+            totalRegions={russiaStats.totalRegions}
+            dailyActivity={russiaStats.dailyActivity}
+            onClose={handleCloseRussiaStats}
+          />
+        </div>
+      )}
+      
+      {/* Детальная статистика региона (слева под статистикой РФ) */}
+      {selectedRegionId && regionStats && (
+        <div style={{
+          position: 'absolute',
+          top: showRussiaStats ? '320px' : '20px',
+          left: '20px',
+          maxHeight: 'calc(80vh - 320px)',
           overflowY: 'auto',
           zIndex: 1000
         }}>

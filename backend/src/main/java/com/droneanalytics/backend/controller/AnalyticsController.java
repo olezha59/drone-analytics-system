@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,10 +19,9 @@ import java.util.Map;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-
 @RestController
 @RequestMapping("/api/analytics")
-@CrossOrigin(origins = "http://localhost:3000") // 👈 Разрешаем запросы от React фронтенда
+@CrossOrigin(origins = "http://localhost:3000")
 public class AnalyticsController {
     
     @Autowired
@@ -110,15 +108,18 @@ public class AnalyticsController {
     
     /**
      * 📌 GET /api/analytics/summary
-     * Общая сводка по всем данным
+     * Общая сводка по всем данным (С ДОБАВЛЕНИЕМ СУТОЧНОЙ АКТИВНОСТИ)
      */
     @GetMapping("/summary")
     @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<Map<String, Object>> getSummary() {
         try {
             Map<String, Object> summary = analyticsService.getSystemSummary();
+            System.out.println("📊 Отправляемая статистика РФ: " + summary);
             return ResponseEntity.ok(summary);
         } catch (Exception e) {
+            System.err.println("❌ Ошибка в getSummary: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }
