@@ -493,3 +493,55 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# Добавляем обработку аргументов командной строки
+import argparse
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Парсер Excel файлов с данными о полетах БПЛА')
+    parser.add_argument('--file', type=str, help='Путь к Excel файлу для обработки')
+    return parser.parse_args()
+
+def main():
+    print("🚀 Запуск исправленного парсера (старый формат таблицы)")
+    print("=" * 60)
+    
+    # Настройки подключения к БД
+    DB_CONNECTION = "postgresql://postgres:password123@localhost:5432/drone_analytics"
+    
+    # Парсим аргументы командной строки
+    args = parse_arguments()
+    
+    # Определяем путь к файлу
+    if args.file:
+        EXCEL_FILE = args.file
+        print(f"📁 Используется файл из аргументов: {EXCEL_FILE}")
+    else:
+        EXCEL_FILE = "data-parser/flight_data.xlsx"
+        print(f"📁 Используется файл по умолчанию: {EXCEL_FILE}")
+    
+    # Проверяем существование файла
+    if not os.path.exists(EXCEL_FILE):
+        logger.error(f"❌ Файл {EXCEL_FILE} не найден!")
+        print("📁 Помести файл flight_data.xlsx в папку data-parser/")
+        return
+    
+    try:
+        # Создаем парсер
+        parser = FlightDataParser(DB_CONNECTION)
+        
+        # Создаем таблицу (если нужно)
+        # parser.create_table()
+        
+        # Запускаем парсинг
+        parser.parse_excel_file(EXCEL_FILE)
+        
+        print("🎉 Парсинг завершен!")
+        print("📊 Проверь данные командой: psql -h localhost -U postgres drone_analytics -c \"SELECT * FROM flight_records LIMIT 3;\"")
+        
+    except Exception as e:
+        logger.error(f"❌ Критическая ошибка: {e}")
+        print("💡 Проверь что PostgreSQL запущен: docker compose up -d postgres")
+
+if __name__ == "__main__":
+    main()

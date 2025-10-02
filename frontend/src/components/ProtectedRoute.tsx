@@ -1,6 +1,5 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import LoginForm from './LoginForm';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -9,22 +8,14 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, isLoading } = useAuth();
 
-  console.log('🛡️ ProtectedRoute - User:', user, 'Loading:', isLoading);
-
   if (isLoading) {
-    return (
-      <div className="loading-container">
-        <div>Проверка авторизации...</div>
-      </div>
-    );
+    return <div>Загрузка...</div>;
   }
 
   if (!user) {
-    console.log('🛡️ No user - showing login form');
-    return <LoginForm />;
+    return <div>Доступ запрещен. Пожалуйста, войдите в систему.</div>;
   }
 
-  console.log('🛡️ User authenticated - showing content');
   return <>{children}</>;
 };
 

@@ -1,7 +1,8 @@
 import axios from 'axios';
 
+// ВАЖНО: Используем относительный путь чтобы Vite проксировал запросы
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: '/api', // Относительный путь - Vite проксирует на localhost:8080
   headers: {
     'Content-Type': 'application/json',
   },
@@ -11,7 +12,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    console.log('🔐 API Request Interceptor - Token:', token);
+    console.log('🔐 API Request Interceptor - Token:', token ? 'present' : 'missing');
     console.log('🔐 Request URL:', config.url);
     
     if (token) {
@@ -21,7 +22,6 @@ apiClient.interceptors.request.use(
       console.log('❌ No token found in localStorage');
     }
     
-    console.log('🔐 Final headers:', config.headers);
     return config;
   },
   (error) => {

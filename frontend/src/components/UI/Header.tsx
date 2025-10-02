@@ -1,12 +1,44 @@
 import React from 'react';
-import { Layout, Button, Dropdown, Space, Menu } from 'antd';
-import { UserOutlined, LogoutOutlined, LoginOutlined } from '@ant-design/icons';
+import { Layout, Button, Dropdown, Space, Menu, Upload, message } from 'antd';
+import { UserOutlined, LogoutOutlined, LoginOutlined, UploadOutlined } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
+import type { UploadProps } from 'antd';
 
 const { Header: AntHeader } = Layout;
 
 const Header: React.FC = () => {
   const { user, logout } = useAuth();
+
+  // Конфигурация загрузки файла
+  const uploadProps: UploadProps = {
+    name: 'file',
+    action: 'http://localhost:8080/api/admin/upload-excel',
+    headers: {
+      authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    accept: '.xlsx,.xls',
+    showUploadList: false,
+    beforeUpload: (file) => {
+      const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
+                     file.type === 'application/vnd.ms-excel';
+      if (!isExcel) {
+        message.error('Можно загружать только Excel файлы!');
+        return false;
+      }
+      return true;
+    },
+    onChange: (info) => {
+      if (info.file.status === 'done') {
+        message.success(`${info.file.name} успешно загружен и обработан`);
+        // Автоматическое обновление данных через 3 секунды
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      } else if (info.file.status === 'error') {
+        message.error(`Ошибка загрузки: ${info.file.response?.message || 'Неизвестная ошибка'}`);
+      }
+    },
+  };
 
   const userMenu = (
     <Menu>
@@ -36,8 +68,21 @@ const Header: React.FC = () => {
         </h1>
       </div>
 
-      {/* Правая часть - информация о пользователе */}
+      {/* Правая часть - информация о пользователе и кнопка загрузки */}
       <Space style={{ color: 'white' }} size="middle">
+        {/* Кнопка загрузки файла (только для ADMIN) */}
+        {user?.role === 'ADMIN' && (
+          <Upload {...uploadProps}>
+            <Button 
+              type="primary" 
+              icon={<UploadOutlined />}
+              style={{ background: '#52c41a', borderColor: '#52c41a' }}
+            >
+              Загрузить Excel
+            </Button>
+          </Upload>
+        )}
+
         {user ? (
           <Dropdown overlay={userMenu} placement="bottomRight">
             <Button 

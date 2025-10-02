@@ -1,12 +1,16 @@
-/* frontend/src/components/Map/DroneHeatMap.css */
+/* ОБЯЗАТЕЛЬНЫЕ СТИЛИ ДЛЯ КАРТЫ */
 .drone-heatmap-container {
-  height: 100% !important;
+  height: 100vh !important; /* 100% высоты экрана */
   width: 100% !important;
   position: relative;
+  border: 5px solid red !important;
+  background: yellow !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .map-loading {
-  height: 100%;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -37,7 +41,7 @@
 }
 
 .map-error {
-  height: 100%;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -70,24 +74,15 @@
   box-shadow: 0 4px 8px rgba(30, 58, 138, 0.3);
 }
 
-/* Убедимся что карта занимает всю высоту */
+/* САМОЕ ВАЖНОЕ - Leaflet контейнер */
 .leaflet-container {
-  height: 100% !important;
+  height: 100vh !important;
+  width: 100% !important;
+  background: lightblue !important;
   font-family: 'Arial', sans-serif;
 }
 
 /* Скрыть атрибуцию Leaflet */
 .leaflet-control-attribution {
   display: none !important;
-}
-
-/* Стили для попапов */
-.leaflet-popup-content {
-  margin: 8px 12px;
-  font-family: 'Arial', sans-serif;
-}
-
-.leaflet-popup-content-wrapper {
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

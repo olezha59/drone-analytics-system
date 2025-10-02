@@ -83,64 +83,63 @@ const RegionDetails: React.FC<RegionDetailsProps> = ({ regionStats, regionName, 
         {regionStats.periodDescription || 'За весь период'}
       </div>
 
-      // В stats-grid добавляем новые карточки для суточной активности
-<div className="stats-grid">
-  <div className="stat-card main-stat">
-    <div className="stat-value">{regionStats.totalFlights?.toLocaleString() || 0}</div>
-    <div className="stat-label">Всего полетов</div>
-  </div>
-  
-  <div className="stat-card">
-    <div className="stat-value">{regionStats.uniqueOperators?.toLocaleString() || 0}</div>
-    <div className="stat-label">Уникальных операторов</div>
-  </div>
-  
-  <div className="stat-card">
-    <div className="stat-value">{Math.round(regionStats.averageFlightDuration || 0)}</div>
-    <div className="stat-label">Ср. длительность (мин)</div>
-  </div>
+      <div className="stats-grid">
+        <div className="stat-card main-stat">
+          <div className="stat-value">{regionStats.totalFlights?.toLocaleString() || 0}</div>
+          <div className="stat-label">Всего полетов</div>
+        </div>
+        
+        <div className="stat-card">
+          <div className="stat-value">{regionStats.uniqueOperators?.toLocaleString() || 0}</div>
+          <div className="stat-label">Уникальных операторов</div>
+        </div>
+        
+        <div className="stat-card">
+          <div className="stat-value">{Math.round(regionStats.averageFlightDuration || 0)}</div>
+          <div className="stat-label">Ср. длительность (мин)</div>
+        </div>
 
-  {/* ДОБАВЛЯЕМ СУТОЧНУЮ АКТИВНОСТЬ */}
-  {regionStats.dailyActivity && (
-    <>
-      <div className="stat-card">
-        <div className="stat-value">{regionStats.dailyActivity.morning || 0}</div>
-        <div className="stat-label">Утром (6-12)</div>
+        {/* ДОБАВЛЯЕМ СУТОЧНУЮ АКТИВНОСТЬ В АБСОЛЮТНЫХ ЧИСЛАХ */}
+        {regionStats.dailyActivity && (
+          <>
+            <div className="stat-card">
+              <div className="stat-value">{regionStats.dailyActivity.morning || 0}</div>
+              <div className="stat-label">Утром (6-12)</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">{regionStats.dailyActivity.day || 0}</div>
+              <div className="stat-label">Днем (12-18)</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">{regionStats.dailyActivity.evening || 0}</div>
+              <div className="stat-label">Вечером (18-24)</div>
+            </div>
+          </>
+        )}
+
+        {regionStats.zeroDays !== undefined && (
+          <div className="stat-card">
+            <div className="stat-value">{regionStats.zeroDays}</div>
+            <div className="stat-label">Дней без полетов</div>
+          </div>
+        )}
+
+        {regionStats.averageDailyFlights && (
+          <div className="stat-card">
+            <div className="stat-value">{regionStats.averageDailyFlights.averageFlightsPerDay?.toFixed(1) || 0}</div>
+            <div className="stat-label">Ср. полетов в день</div>
+          </div>
+        )}
+
+        <div className="stat-card">
+          <div className="stat-value">{getPopularDrone()}</div>
+          <div className="stat-label">Популярный дрон</div>
+        </div>
       </div>
-      <div className="stat-card">
-        <div className="stat-value">{regionStats.dailyActivity.day || 0}</div>
-        <div className="stat-label">Днем (12-18)</div>
-      </div>
-      <div className="stat-card">
-        <div className="stat-value">{regionStats.dailyActivity.evening || 0}</div>
-        <div className="stat-label">Вечером (18-24)</div>
-      </div>
-    </>
-  )}
-
-  {regionStats.zeroDays !== undefined && (
-    <div className="stat-card">
-      <div className="stat-value">{regionStats.zeroDays}</div>
-      <div className="stat-label">Дней без полетов</div>
-    </div>
-  )}
-
-  {regionStats.averageDailyFlights && (
-    <div className="stat-card">
-      <div className="stat-value">{regionStats.averageDailyFlights.averageFlightsPerDay?.toFixed(1) || 0}</div>
-      <div className="stat-label">Ср. полетов в день</div>
-    </div>
-  )}
-
-  <div className="stat-card">
-    <div className="stat-value">{getPopularDrone()}</div>
-    <div className="stat-label">Популярный дрон</div>
-  </div>
-</div>
 
       {dailyActivity && (
         <div className="daily-activity">
-          <h4>⏰ Суточная активность</h4>
+          <h4>⏰ Суточная активность (%)</h4>
           <div className="activity-bars">
             <div className="activity-bar">
               <span className="time-label">Утро (6-12)</span>

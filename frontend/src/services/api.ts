@@ -1,12 +1,14 @@
 import apiClient from '../api/apiClient';
+import type { IRegionsGeoJSON, IRegionStats } from '../types/mapTypes';
 
 export const geoApi = {
-  getRegionsGeoJSON: async () => {
+  getRegionsGeoJSON: async (): Promise<IRegionsGeoJSON> => {
     console.log('🗺️ Fetching GeoJSON data via apiClient...');
-    const response = await apiClient.get('/analytics/regions-geojson');
+    const response = await apiClient.get('/geo/regions');
     return response.data;
   },
 };
+
 export const analyticsApi = {
   getRussiaSummary: async (): Promise<{
     totalOperators: number;
@@ -14,20 +16,20 @@ export const analyticsApi = {
     totalRegions: number;
     totalFlights: number;
   }> => {
-    const response = await api.get('/analytics/summary');
+    const response = await apiClient.get('/analytics/summary');
     return response.data;
   },
 };
 
 export const regionsApi = {
-  getRegionStats: async (regionId: number) => {
+  getRegionStats: async (regionId: number): Promise<IRegionStats> => {
     console.log(`📊 Fetching stats for region ${regionId} via apiClient...`);
     const response = await apiClient.get(`/regions/${regionId}/stats`);
     return response.data;
   },
 
-  getAllRegionsStats: async (regionIds: number[]) => {
-    const statsMap = new Map();
+  getAllRegionsStats: async (regionIds: number[]): Promise<Map<number, IRegionStats>> => {
+    const statsMap = new Map<number, IRegionStats>();
     
     console.log(`Loading stats for all ${regionIds.length} regions via apiClient...`);
     
